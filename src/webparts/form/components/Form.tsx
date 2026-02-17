@@ -11,6 +11,7 @@ type ListItem = {
   NoRigs: number;
   NoJackups: number;
   NoModus: number;
+  siteURL: string;
 };
 
 const Form: React.FC<IFormProps> = ({
@@ -30,7 +31,7 @@ const Form: React.FC<IFormProps> = ({
       setLoading(true);
       setError(null);
 
-      const url = `${siteUrl}/_api/web/lists/GetByTitle('Customers')/items?$select=Id,Title,field_1,field_2,field_3,field_4`;
+      const url = `${siteUrl}/_api/web/lists/GetByTitle('Customers')/items?$select=Id,Title,field_1,field_2,field_3,field_4,SiteURL`;
       try {
         const res: SPHttpClientResponse = await spHttpClient.get(
           url,
@@ -48,6 +49,7 @@ const Form: React.FC<IFormProps> = ({
               NoRigs: i.field_2,
               NoJackups: i.field_3,
               NoModus: i.field_4,
+              siteURL: i.SiteURL,
             })) as ListItem[],
           );
         }
@@ -88,8 +90,12 @@ const Form: React.FC<IFormProps> = ({
                 NoRigs={i.NoRigs}
                 NoJackups={i.NoJackups}
                 NoModus={i.NoModus}
+                customerURL={i.siteURL}
                 setOpenItems={setOpenItems}
                 openItems={openItems}
+                spHttpClient={spHttpClient}
+                siteUrl={siteUrl}
+                setItems={setItems}
               />
             );
           })}
