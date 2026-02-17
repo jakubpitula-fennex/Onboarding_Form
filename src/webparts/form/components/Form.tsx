@@ -2,6 +2,7 @@ import * as React from "react";
 import styles from "./Form.module.scss";
 import type { IFormProps } from "./IFormProps";
 import { SPHttpClientResponse, SPHttpClient } from "@microsoft/sp-http";
+import CustomerCard from "./CustomerCard";
 
 type ListItem = {
   Id: number;
@@ -20,6 +21,7 @@ const Form: React.FC<IFormProps> = ({
   const [items, setItems] = React.useState<ListItem[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [openItems, setOpenItems] = React.useState<number[]>([]);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -42,7 +44,7 @@ const Form: React.FC<IFormProps> = ({
             data.value.map((i: any) => ({
               Id: i.Id,
               Name: i.Title,
-              Address: `${i.field_1}`,
+              Address: i.field_1,
               NoRigs: i.field_2,
               NoJackups: i.field_3,
               NoModus: i.field_4,
@@ -72,21 +74,38 @@ const Form: React.FC<IFormProps> = ({
       className={`${styles.form} ${hasTeamsContext ? styles.teams : ""}`}
     >
       <div className={styles.welcome}>
-        <h3>Edit customer data</h3>
+        <h2>Edit customer data</h2>
         {loading && <div>Loading...</div>}
         {error && <div>Error: {error}</div>}
-        <ul>
-          {items.map((i) => (
-            <div key={i.Id}>
-              <p>
-                {i.Name} - {i.Address}
-              </p>
-              <p>No Rigs: {i.NoRigs}</p>
-              <p>No Jackups: {i.NoJackups}</p>
-              <p>No Modus: {i.NoModus}</p>
-            </div>
-          ))}
-        </ul>
+        <div>
+          {items.map((i) => {
+            return (
+              <CustomerCard
+                key={i.Id}
+                Id={i.Id}
+                Name={i.Name}
+                Address={i.Address}
+                NoRigs={i.NoRigs}
+                NoJackups={i.NoJackups}
+                NoModus={i.NoModus}
+                setOpenItems={setOpenItems}
+                openItems={openItems}
+              />
+            );
+          })}
+          <div
+            style={{
+              backgroundColor: "#25b167",
+              padding: 5,
+              marginBottom: 5,
+              borderRadius: 5,
+              cursor: "pointer",
+              color: "white",
+            }}
+          >
+            <h3> Add new customer </h3>
+          </div>
+        </div>
       </div>
     </section>
   );
