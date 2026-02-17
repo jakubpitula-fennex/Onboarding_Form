@@ -1,45 +1,22 @@
 import * as React from "react";
 import { SPHttpClient } from "@microsoft/sp-http";
 
-const CustomerCard: React.FC<{
-  Id: number;
-  Name: string;
-  Address: string;
-  NoRigs: number;
-  NoJackups: number;
-  NoModus: number;
-  customerURL: string;
-  setOpenItems: React.Dispatch<React.SetStateAction<number[]>>;
-  openItems: number[];
+const NewCustomerCard: React.FC<{
   spHttpClient: SPHttpClient;
   siteUrl: string;
   setItems: React.Dispatch<React.SetStateAction<any[]>>;
-}> = ({
-  Id,
-  Name,
-  Address,
-  NoRigs,
-  NoJackups,
-  NoModus,
-  customerURL,
-  setOpenItems,
-  openItems,
-  spHttpClient,
-  siteUrl,
-  setItems,
-}) => {
-  const isOpen = openItems.indexOf(Id) !== -1;
-
+}> = ({ spHttpClient, siteUrl, setItems }) => {
   const [formValues, setFormValues] = React.useState({
-    Name,
-    Address,
-    NoRigs,
-    NoJackups,
-    NoModus,
-    customerURL,
+    Name: "",
+    Address: "",
+    NoRigs: 0,
+    NoJackups: 0,
+    NoModus: 0,
+    customerURL: "",
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -70,18 +47,23 @@ const CustomerCard: React.FC<{
     e.preventDefault();
     e.stopPropagation();
 
+    if (
+      Object.values(formValues).some(
+        (value) => typeof value === "string" && value.trim() === "",
+      )
+    ) {
+      alert("Please fill in all the fields.");
+      return;
+    }
+
     if (Object.values(errors).some((error) => error !== "")) {
       alert("Please fix the errors before saving.");
       return;
     }
 
-    const url = `${siteUrl}/_api/web/lists/GetByTitle('Customers')/items(${Id})`;
+    const url = `${siteUrl}/_api/web/lists/GetByTitle('Customers')/items`;
     try {
       const res = await spHttpClient.post(url, SPHttpClient.configurations.v1, {
-        headers: {
-          "X-HTTP-Method": "MERGE",
-          "If-Match": "*",
-        },
         body: JSON.stringify({
           Title: formValues.Name,
           field_1: formValues.Address,
@@ -94,58 +76,66 @@ const CustomerCard: React.FC<{
 
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 
+      const data = await res.json();
+      setItems((prev) => [
+        ...prev,
+        {
+          Id: data.Id,
+          Name: formValues.Name,
+          Address: formValues.Address,
+          NoRigs: formValues.NoRigs,
+          NoJackups: formValues.NoJackups,
+          NoModus: formValues.NoModus,
+          siteURL: formValues.customerURL,
+        },
+      ]);
+
       alert("Item saved successfully!");
+
+      setFormValues({
+        Name: "",
+        Address: "",
+        NoRigs: 0,
+        NoJackups: 0,
+        NoModus: 0,
+        customerURL: "",
+      });
+      setErrors({});
+      setIsOpen(false);
     } catch (error) {
       console.error("Error saving item:", error);
     }
   };
 
-  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleCancel = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (window.confirm("Are you sure you want to delete this customer?")) {
-      const url = `${siteUrl}/_api/web/lists/GetByTitle('Customers')/items(${Id})`;
-      try {
-        const res = await spHttpClient.post(
-          url,
-          SPHttpClient.configurations.v1,
-          {
-            headers: {
-              "X-HTTP-Method": "DELETE",
-              "If-Match": "*",
-            },
-          },
-        );
-        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-
-        alert("Item deleted successfully!");
-        setOpenItems(openItems.filter((id) => id !== Id));
-        setItems((prev) => prev.filter((item) => item.Id !== Id));
-      } catch (error) {
-        console.error("Error deleting item:", error);
-      }
-    }
+    setIsOpen(false);
+    setFormValues({
+      Name: "",
+      Address: "",
+      NoRigs: 0,
+      NoJackups: 0,
+      NoModus: 0,
+      customerURL: "",
+    });
+    setErrors({});
   };
 
   return (
     <div
-      key={Id}
       style={{
-        backgroundColor: "#6ca2ad",
+        backgroundColor: "#25b167",
         padding: 5,
         marginBottom: 5,
         borderRadius: 5,
         cursor: "pointer",
-        transition: "0.2s ease",
+        color: "white",
       }}
-      onClick={() =>
-        setOpenItems(
-          isOpen ? openItems.filter((id) => id !== Id) : [...openItems, Id],
-        )
-      }
+      onClick={() => setIsOpen(!isOpen)}
     >
-      <h3>{Name}</h3>
+      <h3>Add New Customer</h3>
       {isOpen && (
         <form onClick={(e) => e.stopPropagation()}>
           {[
@@ -231,9 +221,9 @@ const CustomerCard: React.FC<{
             </button>
             <button
               style={{ backgroundColor: "red", color: "white" }}
-              onClick={handleDelete}
+              onClick={handleCancel}
             >
-              Delete
+              Cancel
             </button>
           </div>
         </form>
@@ -242,4 +232,4 @@ const CustomerCard: React.FC<{
   );
 };
 
-export default CustomerCard;
+export default NewCustomerCard;

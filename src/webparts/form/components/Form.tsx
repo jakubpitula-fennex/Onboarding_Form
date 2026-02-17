@@ -3,6 +3,7 @@ import styles from "./Form.module.scss";
 import type { IFormProps } from "./IFormProps";
 import { SPHttpClientResponse, SPHttpClient } from "@microsoft/sp-http";
 import CustomerCard from "./CustomerCard";
+import NewCustomerCard from "./NewCustomerCard";
 
 type ListItem = {
   Id: number;
@@ -99,18 +100,11 @@ const Form: React.FC<IFormProps> = ({
               />
             );
           })}
-          <div
-            style={{
-              backgroundColor: "#25b167",
-              padding: 5,
-              marginBottom: 5,
-              borderRadius: 5,
-              cursor: "pointer",
-              color: "white",
-            }}
-          >
-            <h3> Add new customer </h3>
-          </div>
+          <NewCustomerCard
+            spHttpClient={spHttpClient}
+            siteUrl={siteUrl}
+            setItems={setItems}
+          />
         </div>
       </div>
     </section>
