@@ -7,6 +7,9 @@ type ListItem = {
   Id: number;
   Name: string;
   Address: string;
+  NoRigs: number;
+  NoJackups: number;
+  NoModus: number;
 };
 
 const Form: React.FC<IFormProps> = ({
@@ -25,22 +28,29 @@ const Form: React.FC<IFormProps> = ({
       setLoading(true);
       setError(null);
 
-      const url = `${siteUrl}/_api/web/lists/getByTitle('Customers')/items?$select=Id,Name,Address`;
+      const url = `${siteUrl}/_api/web/lists/GetByTitle('Customers')/items?$select=Id,Title,field_1,field_2,field_3,field_4`;
       try {
         const res: SPHttpClientResponse = await spHttpClient.get(
           url,
           SPHttpClient.configurations.v1,
         );
-        console.log("res", res);
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 
         const data = await res.json();
         if (isMounted) {
-          setItems(data.value as ListItem[]);
+          setItems(
+            data.value.map((i: any) => ({
+              Id: i.Id,
+              Name: i.Title,
+              Address: `${i.field_1}`,
+              NoRigs: i.field_2,
+              NoJackups: i.field_3,
+              NoModus: i.field_4,
+            })) as ListItem[],
+          );
         }
       } catch (error: any) {
         if (isMounted) {
-          console.log(error);
           setError(error.message || "An error occured");
         }
       } finally {
@@ -67,7 +77,14 @@ const Form: React.FC<IFormProps> = ({
         {error && <div>Error: {error}</div>}
         <ul>
           {items.map((i) => (
-            <li key={i.Id}>{i.Name}</li>
+            <div key={i.Id}>
+              <p>
+                {i.Name} - {i.Address}
+              </p>
+              <p>No Rigs: {i.NoRigs}</p>
+              <p>No Jackups: {i.NoJackups}</p>
+              <p>No Modus: {i.NoModus}</p>
+            </div>
           ))}
         </ul>
       </div>
