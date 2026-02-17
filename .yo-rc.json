@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "18.20.8",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.24.0"
+    },
+    "version": "1.20.0",
+    "libraryName": "onboarding-form",
+    "libraryId": "c6d1bd20-5b5a-4de2-82f8-b1cb0ff591a0",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "onboarding-form",
+    "solutionShortDescription": "onboarding-form description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

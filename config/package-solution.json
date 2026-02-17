@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "onboarding-form-client-side-solution",
+    "id": "c6d1bd20-5b5a-4de2-82f8-b1cb0ff591a0",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.20.0"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "onboarding-form description"
+      },
+      "longDescription": {
+        "default": "onboarding-form description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "onboarding-form Feature",
+        "description": "The feature that activates elements of the onboarding-form solution.",
+        "id": "900fe61f-643a-4e2b-897b-7148671260d2",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/onboarding-form.sppkg"
+  }
+}
