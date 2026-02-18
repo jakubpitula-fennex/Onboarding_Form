@@ -4,7 +4,6 @@ import {
   FnxButton,
   FnxListViewContainer,
   FnxModalMessage,
-  FnxText,
   FnxTextField,
 } from "fennexui";
 
@@ -31,9 +30,11 @@ const NewCustomerCard: React.FC<{
     const { name, value } = e.target;
     let errorMessage = "";
 
+    const isNanValue = isNaN(Number(value));
+
     if (name.startsWith("No")) {
-      if (isNaN(Number(value)) || Number(value) < 0) {
-        errorMessage = "Please enter a valid non-negative number";
+      if (isNanValue || Number(value) < 0) {
+        errorMessage = "This has to be a non-negative number.";
       }
     } else {
       if (value.trim() === "") {
@@ -43,7 +44,7 @@ const NewCustomerCard: React.FC<{
 
     setFormValues((prev) => ({
       ...prev,
-      [name]: name.startsWith("No") ? Number(value) : value,
+      [name]: name.startsWith("No") && !isNanValue ? Number(value) : value,
     }));
 
     setErrors((prev) => ({
@@ -193,26 +194,16 @@ const NewCustomerCard: React.FC<{
                 style={{ marginBottom: 10, textAlign: "left" }}
               >
                 <FnxTextField
-                  type={field.name.startsWith("No") ? "number" : "text"}
                   value={field.value}
                   name={field.name}
                   onChange={handleChange}
                   label={field.label}
                   size="small"
                   fullWidth
+                  error={!!errors[field.name]}
+                  helperText={errors[field.name] || ""}
+                  variant="standard"
                 />
-                <FnxText
-                  style={{
-                    color: "red",
-                    marginTop: 5,
-                    marginBottom: -5,
-                    marginLeft: 3,
-                    fontSize: 12,
-                    minHeight: 16,
-                  }}
-                >
-                  {errors[field.name] || ""}
-                </FnxText>
               </div>
             ))}
             <div

@@ -65,9 +65,11 @@ const CustomerCard: React.FC<{
     const fieldValue = value ?? e.target.value;
     let errorMessage = "";
 
+    const isNanValue = isNaN(Number(fieldValue));
+
     if (name.startsWith("No")) {
-      if (isNaN(Number(fieldValue)) || Number(fieldValue) < 0) {
-        errorMessage = "Please enter a valid non-negative number";
+      if (isNanValue || Number(fieldValue) < 0) {
+        errorMessage = "This has to be a non-negative number.";
       }
     } else {
       if (fieldValue.trim() === "") {
@@ -77,7 +79,8 @@ const CustomerCard: React.FC<{
 
     setFormValues((prev) => ({
       ...prev,
-      [name]: name.startsWith("No") ? Number(fieldValue) : fieldValue,
+      [name]:
+        name.startsWith("No") && !isNanValue ? Number(fieldValue) : fieldValue,
     }));
 
     setErrors((prev) => ({
@@ -226,26 +229,16 @@ const CustomerCard: React.FC<{
                   style={{ marginBottom: 10, textAlign: "left" }}
                 >
                   <FnxTextField
-                    type={field.name.startsWith("No") ? "number" : "text"}
                     value={field.value}
                     name={field.name}
                     onChange={handleChange}
                     label={field.label}
                     size="small"
                     fullWidth
+                    error={!!errors[field.name]}
+                    helperText={errors[field.name] || ""}
+                    variant="standard"
                   />
-                  <FnxText
-                    style={{
-                      color: "red !important",
-                      marginTop: 5,
-                      marginBottom: -5,
-                      marginLeft: 3,
-                      fontSize: 12,
-                      minHeight: 16,
-                    }}
-                  >
-                    {errors[field.name] || ""}
-                  </FnxText>
                 </div>
               ))}
               <div
@@ -288,7 +281,7 @@ const CustomerCard: React.FC<{
           <div
             style={{
               display: "flex",
-              justifyContent: "flex-end",
+              justifyContent: "space-between",
               marginTop: 20,
             }}
           >
