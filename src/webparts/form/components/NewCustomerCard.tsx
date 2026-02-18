@@ -1,5 +1,12 @@
 import * as React from "react";
 import { SPHttpClient } from "@microsoft/sp-http";
+import {
+  FnxButton,
+  FnxListViewContainer,
+  FnxModalMessage,
+  FnxText,
+  FnxTextField,
+} from "fennexui";
 
 const NewCustomerCard: React.FC<{
   spHttpClient: SPHttpClient;
@@ -16,7 +23,9 @@ const NewCustomerCard: React.FC<{
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
-  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+  const [expanded, setExpanded] = React.useState<boolean>(false);
+  const [modalProps, setModalProps] = React.useState<any>(null);
+  const [modalOpen, setModalOpen] = React.useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -52,12 +61,26 @@ const NewCustomerCard: React.FC<{
         (value) => typeof value === "string" && value.trim() === "",
       )
     ) {
-      alert("Please fill in all the fields.");
+      setModalOpen(true);
+      setModalProps({
+        title: "Validation Error",
+        content: "Please fill in all the fields.",
+        className: "alert",
+        dismissButtonText: "Okay",
+        onClose: () => setModalOpen(false),
+      });
       return;
     }
 
     if (Object.values(errors).some((error) => error !== "")) {
-      alert("Please fix the errors before saving.");
+      setModalOpen(true);
+      setModalProps({
+        title: "Validation Error",
+        content: "Please fix the errors before saving.",
+        className: "alert",
+        dismissButtonText: "Okay",
+        onClose: () => setModalOpen(false),
+      });
       return;
     }
 
@@ -90,7 +113,14 @@ const NewCustomerCard: React.FC<{
         },
       ]);
 
-      alert("Item saved successfully!");
+      setModalOpen(true);
+      setModalProps({
+        title: "Success",
+        content: "Item saved successfully.",
+        className: "alert",
+        dismissButtonText: "Okay",
+        onClose: () => setModalOpen(false),
+      });
 
       setFormValues({
         Name: "",
@@ -101,7 +131,7 @@ const NewCustomerCard: React.FC<{
         customerURL: "",
       });
       setErrors({});
-      setIsOpen(false);
+      setExpanded(false);
     } catch (error) {
       console.error("Error saving item:", error);
     }
@@ -111,7 +141,7 @@ const NewCustomerCard: React.FC<{
     e.preventDefault();
     e.stopPropagation();
 
-    setIsOpen(false);
+    setExpanded(false);
     setFormValues({
       Name: "",
       Address: "",
@@ -124,111 +154,96 @@ const NewCustomerCard: React.FC<{
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: "#25b167",
-        padding: 5,
-        marginBottom: 5,
-        borderRadius: 5,
-        cursor: "pointer",
-        color: "white",
-      }}
-      onClick={() => setIsOpen(!isOpen)}
-    >
-      <h3>Add New Customer</h3>
-      {isOpen && (
-        <form onClick={(e) => e.stopPropagation()}>
-          {[
-            { label: "Name", value: formValues.Name, name: "Name" },
-            { label: "Address", value: formValues.Address, name: "Address" },
-            {
-              label: "Number of rigs",
-              value: formValues.NoRigs,
-              name: "NoRigs",
-            },
-            {
-              label: "Number of jack ups",
-              value: formValues.NoJackups,
-              name: "NoJackups",
-            },
-            {
-              label: "Number of MODUs",
-              value: formValues.NoModus,
-              name: "NoModus",
-            },
-            {
-              label: "Site URL",
-              value: formValues.customerURL,
-              name: "customerURL",
-            },
-          ].map((field) => (
-            <div
-              key={field.name}
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "flex-start",
-                padding: 10,
-                gap: 20,
-              }}
-            >
-              <div style={{ width: "25%", textAlign: "left" }}>
-                <p style={{ fontWeight: "bold", margin: 0 }}>{field.label}</p>
-              </div>
+    <>
+      <FnxButton
+        className="primaryButton buttons w-100 mx-0 my-2"
+        onClick={() => setExpanded(!expanded)}
+      >
+        Add New Customer
+      </FnxButton>
+      {expanded && (
+        <FnxListViewContainer>
+          <form onClick={(e) => e.stopPropagation()}>
+            {[
+              { label: "Name", value: formValues.Name, name: "Name" },
+              { label: "Address", value: formValues.Address, name: "Address" },
+              {
+                label: "Number of rigs",
+                value: formValues.NoRigs,
+                name: "NoRigs",
+              },
+              {
+                label: "Number of jack ups",
+                value: formValues.NoJackups,
+                name: "NoJackups",
+              },
+              {
+                label: "Number of MODUs",
+                value: formValues.NoModus,
+                name: "NoModus",
+              },
+              {
+                label: "Site URL",
+                value: formValues.customerURL,
+                name: "customerURL",
+              },
+            ].map((field) => (
               <div
-                style={{
-                  width: "60%",
-                  textAlign: "left",
-                  alignContent: "center",
-                }}
+                key={field.name}
+                style={{ marginBottom: 10, textAlign: "left" }}
               >
-                <input
+                <FnxTextField
                   type={field.name.startsWith("No") ? "number" : "text"}
-                  name={field.name}
                   value={field.value}
+                  name={field.name}
                   onChange={handleChange}
-                  style={{ width: "100%" }}
-                  min={0}
+                  label={field.label}
+                  size="small"
+                  fullWidth
                 />
-                <p
+                <FnxText
                   style={{
                     color: "red",
                     marginTop: 5,
                     marginBottom: -5,
+                    marginLeft: 3,
                     fontSize: 12,
                     minHeight: 16,
                   }}
                 >
                   {errors[field.name] || ""}
-                </p>
+                </FnxText>
               </div>
+            ))}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 10,
+                justifyContent: "flex-end",
+                padding: 10,
+              }}
+            >
+              <FnxButton
+                className="primaryButton buttons"
+                onClick={handleSave}
+                type="button"
+              >
+                Save
+              </FnxButton>
+              <FnxButton
+                className="dangerButton buttons"
+                onClick={handleCancel}
+                type="button"
+              >
+                Cancel
+              </FnxButton>
             </div>
-          ))}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 10,
-              justifyContent: "flex-end",
-              padding: 10,
-            }}
-          >
-            <button
-              style={{ backgroundColor: "green", color: "white" }}
-              onClick={handleSave}
-            >
-              Save
-            </button>
-            <button
-              style={{ backgroundColor: "red", color: "white" }}
-              onClick={handleCancel}
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+          </form>
+        </FnxListViewContainer>
       )}
-    </div>
+      <FnxModalMessage {...modalProps} open={modalOpen}></FnxModalMessage>
+    </>
   );
 };
 

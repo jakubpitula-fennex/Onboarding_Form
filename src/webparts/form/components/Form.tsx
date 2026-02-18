@@ -1,9 +1,16 @@
 import * as React from "react";
-import styles from "./Form.module.scss";
 import type { IFormProps } from "./IFormProps";
 import { SPHttpClientResponse, SPHttpClient } from "@microsoft/sp-http";
 import CustomerCard from "./CustomerCard";
 import NewCustomerCard from "./NewCustomerCard";
+import {
+  FennexGreen,
+  FnxHeader,
+  FnxListViewContainer,
+  FnxLoader,
+  FnxText,
+} from "fennexui";
+import { ThemeProvider } from "styled-components";
 
 type ListItem = {
   Id: number;
@@ -15,11 +22,7 @@ type ListItem = {
   siteURL: string;
 };
 
-const Form: React.FC<IFormProps> = ({
-  hasTeamsContext,
-  siteUrl,
-  spHttpClient,
-}) => {
+const Form: React.FC<IFormProps> = ({ siteUrl, spHttpClient }) => {
   const [items, setItems] = React.useState<ListItem[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -41,6 +44,7 @@ const Form: React.FC<IFormProps> = ({
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 
         const data = await res.json();
+        console.log("Fetched items:", data.value);
         if (isMounted) {
           setItems(
             data.value.map((i: any) => ({
@@ -73,14 +77,12 @@ const Form: React.FC<IFormProps> = ({
   }, [spHttpClient, siteUrl]);
 
   return (
-    <section
-      className={`${styles.form} ${hasTeamsContext ? styles.teams : ""}`}
-    >
-      <div className={styles.welcome}>
-        <h2>Edit customer data</h2>
-        {loading && <div>Loading...</div>}
-        {error && <div>Error: {error}</div>}
-        <div>
+    <ThemeProvider theme={FennexGreen}>
+      <div style={{ textAlign: "center" }}>
+        <FnxHeader>Edit customer data</FnxHeader>
+        {loading && <FnxLoader ariaLive="polite" label="Loading..." size={2} />}
+        {error && <FnxText>Error: {error}</FnxText>}
+        <FnxListViewContainer>
           {items.map((i) => {
             return (
               <CustomerCard
@@ -105,9 +107,9 @@ const Form: React.FC<IFormProps> = ({
             siteUrl={siteUrl}
             setItems={setItems}
           />
-        </div>
+        </FnxListViewContainer>
       </div>
-    </section>
+    </ThemeProvider>
   );
 };
 
