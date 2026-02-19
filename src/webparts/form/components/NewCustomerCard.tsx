@@ -25,6 +25,7 @@ const NewCustomerCard: React.FC<{
   const [expanded, setExpanded] = React.useState<boolean>(false);
   const [modalProps, setModalProps] = React.useState<any>(null);
   const [modalOpen, setModalOpen] = React.useState(false);
+  const [disableSave, setDisableSave] = React.useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -54,6 +55,8 @@ const NewCustomerCard: React.FC<{
   };
 
   const handleSave = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    setDisableSave(true); // To prevent double clicks resulting in multiple entries
+
     e.preventDefault();
     e.stopPropagation();
 
@@ -70,6 +73,7 @@ const NewCustomerCard: React.FC<{
         dismissButtonText: "Okay",
         onClose: () => setModalOpen(false),
       });
+      setDisableSave(false);
       return;
     }
 
@@ -82,6 +86,7 @@ const NewCustomerCard: React.FC<{
         dismissButtonText: "Okay",
         onClose: () => setModalOpen(false),
       });
+      setDisableSave(false);
       return;
     }
 
@@ -135,6 +140,7 @@ const NewCustomerCard: React.FC<{
       setExpanded(false);
     } catch (error) {
       console.error("Error saving item:", error);
+      setDisableSave(false);
     }
   };
 
@@ -152,8 +158,8 @@ const NewCustomerCard: React.FC<{
       customerURL: "",
     });
     setErrors({});
+    setDisableSave(false);
   };
-
   return (
     <>
       <FnxButton
@@ -219,6 +225,7 @@ const NewCustomerCard: React.FC<{
                 className="primaryButton buttons"
                 onClick={handleSave}
                 type="button"
+                disabled={disableSave}
               >
                 Save
               </FnxButton>
