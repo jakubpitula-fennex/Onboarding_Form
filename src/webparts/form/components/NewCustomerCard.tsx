@@ -138,6 +138,7 @@ const NewCustomerCard: React.FC<{
       });
       setErrors({});
       setExpanded(false);
+      setDisableSave(false);
     } catch (error) {
       console.error("Error saving item:", error);
       setDisableSave(false);
