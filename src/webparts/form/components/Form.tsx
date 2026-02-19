@@ -26,7 +26,6 @@ const Form: React.FC<IFormProps> = ({ siteUrl, spHttpClient }) => {
   const [items, setItems] = React.useState<ListItem[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [openItems, setOpenItems] = React.useState<number[]>([]);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -94,8 +93,6 @@ const Form: React.FC<IFormProps> = ({ siteUrl, spHttpClient }) => {
                 NoJackups={i.NoJackups}
                 NoModus={i.NoModus}
                 customerURL={i.siteURL}
-                setOpenItems={setOpenItems}
-                openItems={openItems}
                 spHttpClient={spHttpClient}
                 siteUrl={siteUrl}
                 setItems={setItems}

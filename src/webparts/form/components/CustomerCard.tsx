@@ -21,8 +21,6 @@ const CustomerCard: React.FC<{
   NoJackups: number;
   NoModus: number;
   customerURL: string;
-  setOpenItems: React.Dispatch<React.SetStateAction<number[]>>;
-  openItems: number[];
   spHttpClient: SPHttpClient;
   siteUrl: string;
   setItems: React.Dispatch<React.SetStateAction<any[]>>;
@@ -34,8 +32,6 @@ const CustomerCard: React.FC<{
   NoJackups,
   NoModus,
   customerURL,
-  setOpenItems,
-  openItems,
   spHttpClient,
   siteUrl,
   setItems,
@@ -170,7 +166,6 @@ const CustomerCard: React.FC<{
             dismissButtonText: "Okay",
             onClose: () => {
               setModalOpen(false);
-              setOpenItems(openItems.filter((id) => id !== Id));
               setItems((prev) => prev.filter((item) => item.Id !== Id));
             },
           });
