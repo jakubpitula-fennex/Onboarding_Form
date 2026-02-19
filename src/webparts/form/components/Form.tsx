@@ -43,7 +43,6 @@ const Form: React.FC<IFormProps> = ({ siteUrl, spHttpClient }) => {
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 
         const data = await res.json();
-        console.log("Fetched items:", data.value);
         if (isMounted) {
           setItems(
             data.value.map((i: any) => ({
