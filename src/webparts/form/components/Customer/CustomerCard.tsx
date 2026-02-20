@@ -9,10 +9,10 @@ import {
   CustomerType,
   CustomerTypeWithoutId,
 } from "../../../../types/CustomerTypes";
-import { FnxModalPropsType } from "../../../../types/uiTypes";
 import { DeleteCustomerModal } from "./DeleteCustomerModal";
 import { validateField } from "../../utils/validation";
 import CustomerForm from "./CustomerForm";
+import { useModal } from "../../hooks/useModal";
 
 const CustomerCard: React.FC<{
   customer: CustomerType;
@@ -20,11 +20,8 @@ const CustomerCard: React.FC<{
   setItems: React.Dispatch<React.SetStateAction<CustomerType[]>>;
 }> = ({ customer, dbUrl, setItems }) => {
   const [expanded, setExpanded] = React.useState<boolean>(false);
-  const [modalProps, setModalProps] =
-    React.useState<Partial<FnxModalPropsType> | null>(null);
   const [deletionConfirmed, setDeletionConfirmed] =
     React.useState<boolean>(false);
-  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
   const [deleteAlertOpen, setDeleteAlertOpen] = React.useState<boolean>(false);
 
   const [formValues, setFormValues] = React.useState<CustomerTypeWithoutId>({
@@ -37,6 +34,8 @@ const CustomerCard: React.FC<{
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
+
+  const { modalOpen, modalProps, showModal } = useModal();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -63,14 +62,7 @@ const CustomerCard: React.FC<{
     e.stopPropagation();
 
     if (Object.values(errors).some((error) => error !== "")) {
-      setModalOpen(true);
-      setModalProps({
-        title: "Validation Error",
-        content: "Please fix the errors before saving.",
-        className: "alert",
-        dismissButtonText: "Okay",
-        onClose: () => setModalOpen(false),
-      });
+      showModal("Validation Error", "Please fix the errors before saving.");
       return;
     }
 
@@ -95,17 +87,13 @@ const CustomerCard: React.FC<{
         ),
       );
       setExpanded(false);
-
-      setModalOpen(true);
-      setModalProps({
-        title: "Success",
-        content: "Item saved successfully.",
-        className: "alert",
-        dismissButtonText: "Okay",
-        onClose: () => setModalOpen(false),
-      });
+      showModal("Success", "Item saved successfully.");
     } catch (error) {
       console.error("Error saving item:", error);
+      showModal(
+        "Error",
+        `An error occurred while saving the item:\n${error}.\nPlease try again.`,
+      );
     }
   };
 
@@ -127,23 +115,15 @@ const CustomerCard: React.FC<{
             },
           });
           if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-
-          setModalOpen(true);
-
-          setModalProps({
-            title: "Success",
-            content: "Item deleted successfully.",
-            className: "alert",
-            dismissButtonText: "Okay",
-            onClose: () => {
-              setModalOpen(false);
-              setItems((prev) =>
-                prev.filter((item) => item.id !== customer.id),
-              );
-            },
+          showModal("Success", "Item deleted successfully.", () => {
+            setItems((prev) => prev.filter((item) => item.id !== customer.id));
           });
         } catch (error) {
           console.error("Error deleting item:", error);
+          showModal(
+            "Error",
+            `An error occurred while deleting the item:\n${error}.\nPlease try again.`,
+          );
         }
       };
 

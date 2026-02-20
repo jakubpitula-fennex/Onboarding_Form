@@ -4,9 +4,9 @@ import {
   CustomerType,
   CustomerTypeWithoutId,
 } from "../../../../types/CustomerTypes";
-import { FnxModalPropsType } from "../../../../types/uiTypes";
 import { validateField } from "../../utils/validation";
 import CustomerForm from "./CustomerForm";
+import { useModal } from "../../hooks/useModal";
 
 const NewCustomerCard: React.FC<{
   dbUrl: string;
@@ -25,10 +25,9 @@ const NewCustomerCard: React.FC<{
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [expanded, setExpanded] = React.useState<boolean>(false);
-  const [modalProps, setModalProps] =
-    React.useState<Partial<FnxModalPropsType> | null>(null);
-  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
   const [disableSave, setDisableSave] = React.useState<boolean>(false);
+
+  const { modalOpen, modalProps, showModal } = useModal();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name;
@@ -57,27 +56,13 @@ const NewCustomerCard: React.FC<{
         (value) => typeof value === "string" && value.trim() === "",
       )
     ) {
-      setModalOpen(true);
-      setModalProps({
-        title: "Validation Error",
-        content: "Please fill in all the fields.",
-        className: "alert",
-        dismissButtonText: "Okay",
-        onClose: () => setModalOpen(false),
-      });
+      showModal("Validation Error", "Please fill in all the fields.");
       setDisableSave(false);
       return;
     }
 
     if (Object.values(errors).some((error) => error !== "")) {
-      setModalOpen(true);
-      setModalProps({
-        title: "Validation Error",
-        content: "Please fix the errors before saving.",
-        className: "alert",
-        dismissButtonText: "Okay",
-        onClose: () => setModalOpen(false),
-      });
+      showModal("Validation Error", "Please fix the errors before saving.");
       setDisableSave(false);
       return;
     }
@@ -102,22 +87,19 @@ const NewCustomerCard: React.FC<{
         },
       ]);
 
-      setModalOpen(true);
-      setModalProps({
-        title: "Success",
-        content: "Item saved successfully.",
-        className: "alert",
-        dismissButtonText: "Okay",
-        onClose: () => setModalOpen(false),
-      });
+      showModal("Success", "Item saved successfully.");
 
       setFormValues(initialFormValues);
-
       setErrors({});
       setExpanded(false);
       setDisableSave(false);
     } catch (error) {
       console.error("Error saving item:", error);
+      showModal(
+        "Error",
+        `An error occurred while saving the item:\n${error}.\nPlease try again.`,
+      );
+
       setDisableSave(false);
     }
   };
