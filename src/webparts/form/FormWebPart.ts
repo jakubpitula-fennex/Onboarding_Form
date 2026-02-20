@@ -28,8 +28,6 @@ export default class FormWebPart extends BaseClientSideWebPart<IFormWebPartProps
       environmentMessage: this._environmentMessage,
       hasTeamsContext: !!this.context.sdks.microsoftTeams,
       userDisplayName: this.context.pageContext.user.displayName,
-      siteUrl: this.context.pageContext.web.absoluteUrl,
-      spHttpClient: this.context.spHttpClient,
     });
 
     ReactDom.render(element, this.domElement);

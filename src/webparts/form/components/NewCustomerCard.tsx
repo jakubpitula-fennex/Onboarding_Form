@@ -1,5 +1,4 @@
 import * as React from "react";
-import { SPHttpClient } from "@microsoft/sp-http";
 import {
   FnxButton,
   FnxListViewContainer,
@@ -8,10 +7,9 @@ import {
 } from "fennexui";
 
 const NewCustomerCard: React.FC<{
-  spHttpClient: SPHttpClient;
-  siteUrl: string;
+  dbUrl: string;
   setItems: React.Dispatch<React.SetStateAction<any[]>>;
-}> = ({ spHttpClient, siteUrl, setItems }) => {
+}> = ({ dbUrl, setItems }) => {
   const [formValues, setFormValues] = React.useState({
     Name: "",
     Address: "",
@@ -90,16 +88,19 @@ const NewCustomerCard: React.FC<{
       return;
     }
 
-    const url = `${siteUrl}/_api/web/lists/GetByTitle('Customers')/items`;
     try {
-      const res = await spHttpClient.post(url, SPHttpClient.configurations.v1, {
+      const res = await fetch(dbUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          Title: formValues.Name,
-          field_1: formValues.Address,
-          field_2: formValues.NoRigs,
-          field_3: formValues.NoJackups,
-          field_4: formValues.NoModus,
-          SiteURL: formValues.customerURL,
+          name: formValues.Name,
+          address: formValues.Address,
+          noRigs: formValues.NoRigs,
+          noJackups: formValues.NoJackups,
+          noModus: formValues.NoModus,
+          siteURL: formValues.customerURL,
         }),
       });
 
@@ -109,7 +110,7 @@ const NewCustomerCard: React.FC<{
       setItems((prev) => [
         ...prev,
         {
-          Id: data.Id,
+          Id: data.id,
           Name: formValues.Name,
           Address: formValues.Address,
           NoRigs: formValues.NoRigs,

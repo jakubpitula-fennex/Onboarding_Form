@@ -1,5 +1,4 @@
 import * as React from "react";
-import { SPHttpClient } from "@microsoft/sp-http";
 import {
   FnxAccordion,
   FnxAccordionDetails,
@@ -21,8 +20,7 @@ const CustomerCard: React.FC<{
   NoJackups: number;
   NoModus: number;
   customerURL: string;
-  spHttpClient: SPHttpClient;
-  siteUrl: string;
+  dbUrl: string;
   setItems: React.Dispatch<React.SetStateAction<any[]>>;
 }> = ({
   Id,
@@ -32,8 +30,7 @@ const CustomerCard: React.FC<{
   NoJackups,
   NoModus,
   customerURL,
-  spHttpClient,
-  siteUrl,
+  dbUrl,
   setItems,
 }) => {
   const [expanded, setExpanded] = React.useState<boolean>(false);
@@ -101,20 +98,21 @@ const CustomerCard: React.FC<{
       return;
     }
 
-    const url = `${siteUrl}/_api/web/lists/GetByTitle('Customers')/items(${Id})`;
     try {
-      const res = await spHttpClient.post(url, SPHttpClient.configurations.v1, {
+      const res = await fetch(`${dbUrl}/${Id}`, {
+        method: "PUT",
         headers: {
-          "X-HTTP-Method": "MERGE",
           "If-Match": "*",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Title: formValues.Name,
-          field_1: formValues.Address,
-          field_2: formValues.NoRigs,
-          field_3: formValues.NoJackups,
-          field_4: formValues.NoModus,
-          SiteURL: formValues.customerURL,
+          id: Id,
+          name: formValues.Name,
+          address: formValues.Address,
+          noRigs: formValues.NoRigs,
+          noJackups: formValues.NoJackups,
+          noModus: formValues.NoModus,
+          siteURL: formValues.customerURL,
         }),
       });
 
@@ -143,18 +141,13 @@ const CustomerCard: React.FC<{
   React.useEffect(() => {
     if (deletionConfirmed) {
       const deleteItem = async () => {
-        const url = `${siteUrl}/_api/web/lists/GetByTitle('Customers')/items(${Id})`;
         try {
-          const res = await spHttpClient.post(
-            url,
-            SPHttpClient.configurations.v1,
-            {
-              headers: {
-                "X-HTTP-Method": "DELETE",
-                "If-Match": "*",
-              },
+          const res = await fetch(`${dbUrl}/${Id}`, {
+            method: "DELETE",
+            headers: {
+              "If-Match": "*",
             },
-          );
+          });
           if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 
           setModalOpen(true);

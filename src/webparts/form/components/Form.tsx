@@ -1,6 +1,5 @@
 import * as React from "react";
 import type { IFormProps } from "./IFormProps";
-import { SPHttpClientResponse, SPHttpClient } from "@microsoft/sp-http";
 import CustomerCard from "./CustomerCard";
 import NewCustomerCard from "./NewCustomerCard";
 import {
@@ -22,10 +21,11 @@ type ListItem = {
   siteURL: string;
 };
 
-const Form: React.FC<IFormProps> = ({ siteUrl, spHttpClient }) => {
+const Form: React.FC<IFormProps> = () => {
   const [items, setItems] = React.useState<ListItem[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
+  const dbUrl = "https://localhost:7165/api/customers";
 
   React.useEffect(() => {
     let isMounted = true;
@@ -34,25 +34,24 @@ const Form: React.FC<IFormProps> = ({ siteUrl, spHttpClient }) => {
       setLoading(true);
       setError(null);
 
-      const url = `${siteUrl}/_api/web/lists/GetByTitle('Customers')/items?$select=Id,Title,field_1,field_2,field_3,field_4,SiteURL`;
       try {
-        const res: SPHttpClientResponse = await spHttpClient.get(
-          url,
-          SPHttpClient.configurations.v1,
-        );
+        const res = await fetch(dbUrl);
+
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 
         const data = await res.json();
+
+        console.log(data);
         if (isMounted) {
           setItems(
-            data.value.map((i: any) => ({
-              Id: i.Id,
-              Name: i.Title,
-              Address: i.field_1,
-              NoRigs: i.field_2,
-              NoJackups: i.field_3,
-              NoModus: i.field_4,
-              siteURL: i.SiteURL,
+            data.map((i: any) => ({
+              Id: i.id,
+              Name: i.name,
+              Address: i.address,
+              NoRigs: i.noRigs,
+              NoJackups: i.noJackups,
+              NoModus: i.noModus,
+              siteURL: i.siteUrl,
             })) as ListItem[],
           );
         }
@@ -72,7 +71,7 @@ const Form: React.FC<IFormProps> = ({ siteUrl, spHttpClient }) => {
     return () => {
       isMounted = false;
     };
-  }, [spHttpClient, siteUrl]);
+  }, [dbUrl]);
 
   return (
     <ThemeProvider theme={FennexGreen}>
@@ -92,17 +91,12 @@ const Form: React.FC<IFormProps> = ({ siteUrl, spHttpClient }) => {
                 NoJackups={i.NoJackups}
                 NoModus={i.NoModus}
                 customerURL={i.siteURL}
-                spHttpClient={spHttpClient}
-                siteUrl={siteUrl}
+                dbUrl={dbUrl}
                 setItems={setItems}
               />
             );
           })}
-          <NewCustomerCard
-            spHttpClient={spHttpClient}
-            siteUrl={siteUrl}
-            setItems={setItems}
-          />
+          <NewCustomerCard dbUrl={dbUrl} setItems={setItems} />
         </FnxListViewContainer>
       </div>
     </ThemeProvider>
