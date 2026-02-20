@@ -89,6 +89,13 @@ const CustomerCard: React.FC<{
 
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === customer.id ? { id: customer.id, ...formValues } : item,
+        ),
+      );
+      setExpanded(false);
+
       setModalOpen(true);
       setModalProps({
         title: "Success",
