@@ -70,6 +70,14 @@ const CustomerCard: React.FC<{
       }
     }
 
+    if (name === "customerURL" && fieldValue.trim() !== "") {
+      try {
+        new URL(fieldValue);
+      } catch {
+        errorMessage = "Please enter a valid URL.";
+      }
+    }
+
     setFormValues((prev) => ({
       ...prev,
       [name]:

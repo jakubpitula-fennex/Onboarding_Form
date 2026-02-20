@@ -16,7 +16,7 @@ const NewCustomerCard: React.FC<{
     NoRigs: 0,
     NoJackups: 0,
     NoModus: 0,
-    customerURL: "",
+    customerURL: "https://",
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -26,6 +26,8 @@ const NewCustomerCard: React.FC<{
   const [disableSave, setDisableSave] = React.useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Validation
+
     const { name, value } = e.target;
     let errorMessage = "";
 
@@ -38,6 +40,14 @@ const NewCustomerCard: React.FC<{
     } else {
       if (value.trim() === "") {
         errorMessage = "This field is required.";
+      }
+    }
+
+    if (name === "customerURL" && value.trim() !== "") {
+      try {
+        new URL(value);
+      } catch {
+        errorMessage = "Please enter a valid URL.";
       }
     }
 
@@ -135,7 +145,7 @@ const NewCustomerCard: React.FC<{
         NoRigs: 0,
         NoJackups: 0,
         NoModus: 0,
-        customerURL: "",
+        customerURL: "https://",
       });
       setErrors({});
       setExpanded(false);
@@ -157,7 +167,7 @@ const NewCustomerCard: React.FC<{
       NoRigs: 0,
       NoJackups: 0,
       NoModus: 0,
-      customerURL: "",
+      customerURL: "https://",
     });
     setErrors({});
     setDisableSave(false);
