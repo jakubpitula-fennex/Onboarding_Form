@@ -15,3 +15,16 @@ export type DeleteCustomerModalProps = {
   setDeleteAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setDeletionConfirmed: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
+export type CustomerFormProps = {
+  formValues: CustomerTypeWithoutId;
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement>,
+    value?: string,
+  ) => void;
+  handleSave: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  handleDismiss: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  dismissButtonText: string;
+  errors: Record<string, string>;
+  disableSave?: boolean;
+};

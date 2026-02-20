@@ -1,20 +1,7 @@
 import { FnxButton, FnxListViewContainer, FnxTextField } from "fennexui";
 import * as React from "react";
 import { FIELD_LABELS } from "../../../../consts";
-import { CustomerTypeWithoutId } from "../../../../types/CustomerTypes";
-
-type CustomerFormProps = {
-  formValues: CustomerTypeWithoutId;
-  handleChange: (
-    e: React.ChangeEvent<HTMLInputElement>,
-    value?: string,
-  ) => void;
-  handleSave: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  handleDismiss: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  dismissButtonText: string;
-  errors: Record<string, string>;
-  disableSave?: boolean;
-};
+import { CustomerFormProps } from "../../../../types/CustomerTypes";
 
 export const CustomerForm: React.FC<CustomerFormProps> = ({
   formValues,
