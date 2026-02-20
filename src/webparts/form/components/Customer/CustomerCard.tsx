@@ -49,7 +49,7 @@ const CustomerCard: React.FC<{
 
     setFormValues((prev) => ({
       ...prev,
-      [name]: name.startsWith("no") ? Number(fieldValue) : fieldValue,
+      [name]: fieldValue,
     }));
 
     setErrors((prev) => ({

@@ -3,17 +3,13 @@ export function validateField(name: string, value: string): string {
 
   const isNanValue = isNaN(Number(value));
 
-  if (name.startsWith("no")) {
+  if (value.trim() === "") {
+    errorMessage = "This field is required.";
+  } else if (name.startsWith("no")) {
     if (isNanValue || Number(value) < 0) {
       errorMessage = "This has to be a non-negative number.";
     }
-  } else {
-    if (value.trim() === "") {
-      errorMessage = "This field is required.";
-    }
-  }
-
-  if (name === "siteUrl" && value.trim() !== "") {
+  } else if (name === "siteUrl") {
     try {
       new URL(value);
     } catch {
