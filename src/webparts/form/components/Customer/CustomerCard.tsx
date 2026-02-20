@@ -70,7 +70,6 @@ const CustomerCard: React.FC<{
       const res = await fetch(`${dbUrl}/${customer.id}`, {
         method: "PUT",
         headers: {
-          "If-Match": "*",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -110,9 +109,6 @@ const CustomerCard: React.FC<{
         try {
           const res = await fetch(`${dbUrl}/${customer.id}`, {
             method: "DELETE",
-            headers: {
-              "If-Match": "*",
-            },
           });
           if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
           showModal("Success", "Item deleted successfully.", () => {
