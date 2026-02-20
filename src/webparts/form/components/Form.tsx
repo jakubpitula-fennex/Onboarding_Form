@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { IFormProps } from "./IFormProps";
-import CustomerCard from "./CustomerCard";
-import NewCustomerCard from "./NewCustomerCard";
+import CustomerCard from "./Customer/CustomerCard";
+import NewCustomerCard from "./Customer/NewCustomerCard";
 import {
   FennexGreen,
   FnxHeader,
@@ -10,21 +10,13 @@ import {
   FnxText,
 } from "fennexui";
 import { ThemeProvider } from "styled-components";
-
-type ListItem = {
-  Id: number;
-  Name: string;
-  Address: string;
-  NoRigs: number;
-  NoJackups: number;
-  NoModus: number;
-  siteURL: string;
-};
+import { CustomerType } from "../../../types/CustomerTypes";
 
 const Form: React.FC<IFormProps> = () => {
-  const [items, setItems] = React.useState<ListItem[]>([]);
+  const [items, setItems] = React.useState<CustomerType[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
+
   const dbUrl = "https://localhost:7165/api/customers";
 
   React.useEffect(() => {
@@ -41,23 +33,12 @@ const Form: React.FC<IFormProps> = () => {
 
         const data = await res.json();
 
-        console.log(data);
         if (isMounted) {
-          setItems(
-            data.map((i: any) => ({
-              Id: i.id,
-              Name: i.name,
-              Address: i.address,
-              NoRigs: i.noRigs,
-              NoJackups: i.noJackups,
-              NoModus: i.noModus,
-              siteURL: i.siteUrl,
-            })) as ListItem[],
-          );
+          setItems(data as CustomerType[]);
         }
       } catch (error: any) {
         if (isMounted) {
-          setError(error.message || "An error occured");
+          setError(error.message || "An error occurred");
         }
       } finally {
         if (isMounted) {
@@ -83,14 +64,8 @@ const Form: React.FC<IFormProps> = () => {
           {items.map((i) => {
             return (
               <CustomerCard
-                key={i.Id}
-                Id={i.Id}
-                Name={i.Name}
-                Address={i.Address}
-                NoRigs={i.NoRigs}
-                NoJackups={i.NoJackups}
-                NoModus={i.NoModus}
-                customerURL={i.siteURL}
+                key={i.id}
+                customer={i}
                 dbUrl={dbUrl}
                 setItems={setItems}
               />
